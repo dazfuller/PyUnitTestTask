@@ -98,6 +98,7 @@ async function run() {
     var coverageTool = tl.tool(coverageToolPath).arg(['xml', '-o', coverageOutputPath]);
     coverageTool.execSync();
 
+    // Generate the coverage reports
     let coverageHtmlPath = path.join(coverageOutput, 'htmlcov');
     coverageTool = tl.tool(coverageToolPath).arg(['html', '-d', coverageHtmlPath]);
     coverageTool.execSync();
