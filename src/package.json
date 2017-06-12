@@ -1,0 +1,28 @@
+{
+  "name": "pyunittesttask",
+  "version": "1.0.0",
+  "description": "Python unit testing",
+  "main": "src/unittest.js",
+  "dependencies": {
+    "vsts-task-lib": "^2.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^7.0.22",
+    "@types/q": "^1.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "htts://github.com/dazfuller/PyUnitTestTask"
+  },
+  "keywords": [
+    "vsts",
+    "vsts-extension",
+    "python",
+    "unittest"
+  ],
+  "author": "dazfuller",
+  "license": "MIT"
+}

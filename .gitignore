@@ -1,0 +1,8 @@
+node_modules/
+venv/
+.vscode
+package-lock.json
+*.js
+*.js.map
+.taskkey
+*.vsix
