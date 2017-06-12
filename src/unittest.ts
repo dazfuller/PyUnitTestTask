@@ -93,6 +93,11 @@ async function run() {
     let unittestTool = tl.tool(coverageToolPath).arg(['run', '-m', 'xmlrunner', 'discover']);
     unittestTool.execSync(toolRunOptions);
 
+    // Remove the output path if it already exists to ensure that old artefacts are not persisted
+    if (tl.exist(coverageOutput)) {
+        tl.rmRF(coverageOutput);
+    }
+
     // Generate the coverage output files
     let coverageOutputPath = path.join(coverageOutput, 'coverage.xml');
     var coverageTool = tl.tool(coverageToolPath).arg(['xml', '-o', coverageOutputPath]);
