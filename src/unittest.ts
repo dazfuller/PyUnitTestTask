@@ -1,11 +1,15 @@
 import tl = require('vsts-task-lib/task')
 import tr = require('vsts-task-lib/toolrunner')
 import path = require('path')
+import fs = require('fs')
+import xml2js = require('xml2js')
 
 let agentBuildDir = tl.getVariable('Agent.BuildDirectory');
 let rootDir = tl.getPathInput('pythonroot', false, true);
 let requirementFile = tl.getPathInput('reqfile', false, true);
 let coverageOutput = tl.getPathInput('coveragedir', false, false);
+
+let testFileMask = 'TEST-*.xml';
 
 /**
  * Activates the virtual environment created at the provided location
@@ -107,6 +111,19 @@ async function run() {
     let coverageHtmlPath = path.join(coverageOutput, 'htmlcov');
     coverageTool = tl.tool(coverageToolPath).arg(['html', '-d', coverageHtmlPath]);
     coverageTool.execSync();
+
+    let parser = new xml2js.Parser();
+    let allFiles = tl.find('.');
+    let lastCoverageFile = tl.match(allFiles, testFileMask).sort().slice(-1)[0]
+    fs.readFile(lastCoverageFile, function(err: NodeJS.ErrnoException, data: Buffer) {
+        parser.parseString(data, function(err: any, result: any) {
+            let failureCount = parseInt(result.testsuite.$.failures);
+
+            if (failureCount > 0) {
+                tl.setResult(tl.TaskResult.Failed, `${failureCount} failed test(s)`);
+            }
+        });
+    });
 }
 
 run();

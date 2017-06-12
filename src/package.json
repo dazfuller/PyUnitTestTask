@@ -4,11 +4,13 @@
   "description": "Python unit testing",
   "main": "src/unittest.js",
   "dependencies": {
-    "vsts-task-lib": "^2.0.5"
+    "vsts-task-lib": "^2.0.5",
+    "xml2js": "^0.4.17"
   },
   "devDependencies": {
     "@types/node": "^7.0.22",
-    "@types/q": "^1.0.0"
+    "@types/q": "^1.0.0",
+    "@types/xml2js": "0.0.33"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
