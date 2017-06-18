@@ -1,0 +1,49 @@
+{
+    "manifestVersion": 1,
+    "id": "pyunittest-task",
+    "name": "Python Test",
+    "version": "0.0.3",
+    "publisher": "dazfuller",
+    "public": false,
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "icons": {
+        "default": "images/icon.png"
+    },
+    "description": "Executes Python unit tests and outputs coverage results",
+    "content": {
+        "details": {
+            "path": "overview.md"
+        },
+	"license": {
+            "path": "LICENSE.md"
+        }
+    },
+    "categories": [
+        "Build and release"
+    ],
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/dazfuller/PyUnitTestTask"
+    },
+    "files": [
+        {
+            "path": "src"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "pyunittest-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "src"
+            }
+        }
+    ]
+}
