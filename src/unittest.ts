@@ -3,6 +3,7 @@ import tr = require('vsts-task-lib/toolrunner')
 import path = require('path')
 import fs = require('fs')
 import xml2js = require('xml2js')
+import * as rg from './reportgen'
 
 let agentBuildDir = tl.getVariable('Agent.BuildDirectory');
 let rootDir = tl.getPathInput('pythonroot', false, true);
@@ -107,10 +108,31 @@ async function run() {
     var coverageTool = tl.tool(coverageToolPath).arg(['xml', '-o', coverageOutputPath]);
     coverageTool.execSync();
 
+    // Parse the coverage output file
+    // TODO: This can be removed once VSTS tasks issue 3027 has been resolved
+    // https://github.com/Microsoft/vsts-tasks/issues/3027
+    let coveredClasses = rg.parseCoverageFile(coverageOutputPath);
+    let coverageReport = rg.generateCoverageReport(coveredClasses);
+
     // Generate the coverage reports
     let coverageHtmlPath = path.join(coverageOutput, 'htmlcov');
     coverageTool = tl.tool(coverageToolPath).arg(['html', '-d', coverageHtmlPath]);
     coverageTool.execSync();
+
+    // Rename the generated index to index_full and create a new summarised
+    // index file
+    // TODO: this can be removed once VSTS tasks issue 3027 has been resolved
+    // https://github.com/Microsoft/vsts-tasks/issues/3027
+    let indexFilePath = path.resolve(coverageHtmlPath, 'index.html');
+    let indexFullFilePath = path.resolve(coverageHtmlPath, 'index_full.html');
+    tl.mv(indexFilePath, indexFullFilePath);
+
+    fs.writeFile(indexFilePath, coverageReport, { flag: 'w' }, function(err) {
+        if (err) {
+            return tl.setResult(tl.TaskResult.Failed, err.message);
+        }
+        tl.debug('Generated report file');
+    });
 
     let parser = new xml2js.Parser();
     let allFiles = tl.find('.');
@@ -121,6 +143,8 @@ async function run() {
 
             if (failureCount > 0) {
                 tl.setResult(tl.TaskResult.Failed, `${failureCount} failed test(s)`);
+            } else {
+                tl.setResult(tl.TaskResult.Succeeded, 'Executed tests and produced coverage information');
             }
         });
     });
