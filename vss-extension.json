@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "pyunittest-task",
     "name": "Python Test",
-    "version": "0.0.3",
+    "version": "0.0.5",
     "publisher": "dazfuller",
     "public": false,
     "targets": [
