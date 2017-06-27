@@ -51,7 +51,7 @@ export function generateCoverageReport(classes: Array<CoveredClass>): string {
 
     classes.forEach(c => {
         htmlReport += '<tr>';
-        htmlReport += `<td>${c.fileName}</td><td>${c.lineCoverage}</td><td>${c.branchCoverage}</td>`
+        htmlReport += `<td>${c.fileName}</td><td>${c.lineCoverage}%</td><td>${c.branchCoverage}%</td>`
         htmlReport += '</tr>';
     });
 
