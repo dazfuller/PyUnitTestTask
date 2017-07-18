@@ -2,9 +2,9 @@
     "manifestVersion": 1,
     "id": "pyunittest-task",
     "name": "Python Test",
-    "version": "0.0.6",
+    "version": "0.1.1",
     "publisher": "dazfuller",
-    "public": false,
+    "public": true,
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
