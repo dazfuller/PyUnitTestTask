@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "pyunittest-task",
     "name": "Python Test",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "publisher": "dazfuller",
     "public": false,
     "targets": [
@@ -32,6 +32,10 @@
     "files": [
         {
             "path": "src"
+        },
+        {
+            "path": "screenshots",
+            "addressable": true
         }
     ],
     "contributions": [
