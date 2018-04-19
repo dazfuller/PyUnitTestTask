@@ -4,8 +4,8 @@
   "description": "Python unit testing",
   "main": "src/unittest.js",
   "dependencies": {
-    "vsts-task-lib": "^2.0.5",
-    "xml2js": "^0.4.17"
+    "vsts-task-lib": "^2.4.0",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "@types/node": "^7.0.22",
