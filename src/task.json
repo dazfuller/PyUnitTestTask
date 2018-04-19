@@ -42,6 +42,14 @@
       "defaultValue": "coverage",
       "required": true,
       "helpMarkDown": "Path to location to write coverage output information"
+    },
+    {
+      "name": "testfilepattern",
+      "label": "Test file pattern",
+      "type": "string",
+      "defaultValue": "*_test.py",
+      "required": true,
+      "helpMarkDown": "The file pattern used to auto-discover tests, see [Python](https://docs.python.org/3.6/library/unittest.html#test-discovery) docs for more information"
     }
   ],
   "execution": {

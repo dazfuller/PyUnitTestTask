@@ -9,6 +9,7 @@ let agentBuildDir = tl.getVariable('Agent.BuildDirectory');
 let rootDir = tl.getPathInput('pythonroot', false, true);
 let requirementFile = tl.getPathInput('reqfile', false, true);
 let coverageOutput = tl.getPathInput('coveragedir', false, false);
+let testFilePattern = tl.getInput("testfilepattern", true);
 
 let testFileMask = 'TEST-*.xml';
 
@@ -64,7 +65,7 @@ async function configureEnvironment() {
     }
 
     // Get the optional requirements file and restore if available
-    if (requirementFile !== null) {
+    if (fs.lstatSync(requirementFile).isFile()) {
         var pipTool = getPipTool(['install', '-r', requirementFile]);
         await pipTool.exec();
     }
@@ -95,7 +96,7 @@ async function run() {
     let coverageToolPath = tl.which('coverage');
 
     // Execute the unit tests
-    let unittestTool = tl.tool(coverageToolPath).arg(['run', '-m', 'xmlrunner', 'discover']);
+    let unittestTool = tl.tool(coverageToolPath).arg(['run', '-m', 'xmlrunner', 'discover', '-s', '.', '-p', testFilePattern]);
     unittestTool.execSync(toolRunOptions);
 
     // Remove the output path if it already exists to ensure that old artefacts are not persisted
