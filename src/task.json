@@ -39,7 +39,7 @@
       "name": "coveragedir",
       "label": "Coverage output path",
       "type": "filePath",
-      "defaultValue": "",
+      "defaultValue": "coverage",
       "required": true,
       "helpMarkDown": "Path to location to write coverage output information"
     }
