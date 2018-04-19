@@ -50,4 +50,4 @@ If using the hosted build agents then you will need to check that you are using 
 Version | Description
 ------- | -----------
 0.1.x   | Initial release targetting the execution of unit tests on Windows build agents
-0.1.2   | Resolved issue with missing requirements.txt file and added test file pattern settings
+1.0.x   | Resolved issue with missing requirements.txt file and added test file pattern settings
