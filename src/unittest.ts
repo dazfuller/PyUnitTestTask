@@ -13,6 +13,47 @@ let testFilePattern = tl.getInput("testfilepattern", true);
 
 let testFileMask = 'TEST-*.xml';
 
+export interface PythonError {
+    message: string;
+    type: string;
+}
+export interface PythonErrorMain {
+    $: PythonError;
+}
+export interface TestObject {
+    classname: string;
+    file: string;
+    line: string;
+    name: string;
+    time: string;
+    timestamp: string;
+}
+export interface TestCase {
+    $: TestObject;
+    failure: Array<PythonErrorMain>;
+    error: Array<PythonErrorMain>;
+    'system-err': Array<string>;
+    'system-out': Array<string>;
+}
+export interface TestSuitObject {
+    errors: string;
+    failures: string;
+    file: string;
+    name: string;
+    skipped: string;
+    tests: string;
+    time: string;
+    timestamp: string;
+}
+export interface TestSuite {
+    $: TestSuitObject;
+    testcase: Array<TestCase>;
+}
+
+export interface UnitTestXMLObject {
+    testsuite: TestSuite;
+}
+
 /**
  * Activates the virtual environment created at the provided location
  * @param venvPath The path to the virtual environment
@@ -97,7 +138,8 @@ async function run() {
 
     // Execute the unit tests
     let unittestTool = tl.tool(coverageToolPath).arg(['run', '-m', 'xmlrunner', 'discover', '-s', '.', '-p', testFilePattern]);
-    unittestTool.execSync(toolRunOptions);
+    let unitTestToolResult = unittestTool.execSync(toolRunOptions);
+    let isFailure = unitTestToolResult.stderr.match(/.*FAILED\s\((failures|errors)+\=\d[^0]+\){0,1}/gi);
 
     // Remove the output path if it already exists to ensure that old artefacts are not persisted
     if (tl.exist(coverageOutput)) {
@@ -135,20 +177,50 @@ async function run() {
         tl.debug('Generated report file');
     });
 
+    let failureCount = 0;
+    let failedInfo: Array<string> = [];
+
     let parser = new xml2js.Parser();
     let allFiles = tl.find('.');
-    let lastCoverageFile = tl.match(allFiles, testFileMask).sort().slice(-1)[0]
-    fs.readFile(lastCoverageFile, function(err: NodeJS.ErrnoException, data: Buffer) {
-        parser.parseString(data, function(err: any, result: any) {
-            let failureCount = parseInt(result.testsuite.$.failures);
+    let coverageFiles = tl.match(allFiles, testFileMask).sort()
+    await Promise.all(coverageFiles.map(async element => {
+        const data = await new Promise<Buffer>((resolve, reject) => fs.readFile(element, (err, data) => {
+            if (err) reject(err);
+            else resolve(data);
+        }));
+    
+        const presult = await new Promise<UnitTestXMLObject>((presolve, preject) => parser.parseString(data, (err: string, result: UnitTestXMLObject) => {
+            if (err) preject(err);
+            else presolve(result);
+        }));
 
-            if (failureCount > 0) {
-                tl.setResult(tl.TaskResult.Failed, `${failureCount} failed test(s)`);
-            } else {
-                tl.setResult(tl.TaskResult.Succeeded, 'Executed tests and produced coverage information');
-            }
+        let hasFailures = parseInt(presult.testsuite.$.failures);
+        let hasErrors =  parseInt(presult.testsuite.$.errors);
+        if (hasFailures) {
+            presult.testsuite.testcase.forEach(v => {
+                failedInfo.push(v.$.file + ' => ' + v.$.classname + '.' + v.$.name);
+                failedInfo.push(v.failure[0].$.type + ': ' + v.failure[0].$.message);
+            });
+            failureCount += hasFailures;
+        }
+        if (hasErrors) {
+            presult.testsuite.testcase.forEach(v => {
+                failedInfo.push(v.$.file + ' => ' + v.$.classname + '.' + v.$.name);
+                failedInfo.push(v.error[0].$.type + ': ' + v.error[0].$.message);
+            });
+            failureCount += hasErrors;
+        }
+    }));
+
+    if (failureCount > 0) {
+        let s = `${failureCount} failed test(s)`;
+        failedInfo.forEach(f => {
+            s = s + '\r\n' + f;
         });
-    });
+        tl.setResult(tl.TaskResult.Failed, s);
+    } else {
+        tl.setResult(tl.TaskResult.Succeeded, 'Executed tests and produced coverage information');
+    }
 }
 
 run();
